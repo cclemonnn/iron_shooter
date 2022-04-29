@@ -19,7 +19,7 @@ running = True
 class Player(Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('images/all_explosions.png').convert_alpha()
+        self.image = pygame.image.load('images/iron_man/0.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = 0
         self.rect.y = 0
@@ -31,6 +31,7 @@ class Player(Sprite):
 # game loop
 while running:
     screen.fill(GREEN)
+    Player().draw()
     # handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
