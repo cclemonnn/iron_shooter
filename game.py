@@ -45,6 +45,7 @@ class Player(Sprite):
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
+
 player = Player()
 
 # game loop
