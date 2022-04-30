@@ -30,8 +30,11 @@ running = True
 class Player(Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('images/iron_man/0.png').convert_alpha()
-        self.rect = self.image.get_rect()
+        self.images = []
+        for i in range(3):
+            self.images.append(pygame.image.load(f'images/iron_man/{i}.png').convert_alpha())
+        self.current_image = 0
+        self.rect = self.images[self.current_image].get_rect()
         self.rect.x = 0
         self.rect.bottom = 500
         self.speed = 5
@@ -39,7 +42,7 @@ class Player(Sprite):
         self.alive = True
         self.jump = False
         self.in_air = False
-        self.dy = 0
+        self.shoot = False
 
     def move(self):
         if self.alive:
@@ -52,13 +55,42 @@ class Player(Sprite):
             if self.jump:
                 if self.rect.top > 5:
                     self.rect.y -= 5
+                    self.in_air = True
             else:
-                self.rect.bottom += 3
-            if self.rect.bottom > 500:
+                self.rect.bottom += 7
+            if self.rect.bottom >= 500:
+                self.in_air = False
                 self.rect.bottom = 500
 
     def draw(self):
-        screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
+        if not self.shoot:
+            screen.blit(pygame.transform.flip(self.images[0], self.flip, False), self.rect)
+        else:
+            self.current_image += 0.15
+            if 9 > self.current_image > 2:
+                screen.blit(pygame.transform.flip(self.images[2], self.flip, False), self.rect)
+                laser.shoot()
+            elif self.current_image >= 9:
+                self.current_image = 0
+                self.shoot = False
+            else:
+                screen.blit(pygame.transform.flip(self.images[int(self.current_image)], self.flip, False), self.rect)
+
+
+class Laser(Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load(f'images/iron_man/3.png').convert_alpha()
+        self.rect = self.image.get_rect()
+
+    def shoot(self):
+        if not player.flip:
+            self.rect.left = player.rect.right + 80
+            self.rect.y = player.rect.y + 5
+        else:
+            self.rect.right = player.rect.left
+            self.rect.y = player.rect.y + 5
+        screen.blit(pygame.transform.flip(self.image, player.flip, False), self.rect)
 
 
 class Ultron(Sprite):
@@ -75,6 +107,7 @@ class Ultron(Sprite):
         screen.blit(self.image, self.rect)
 
 
+laser = Laser()
 player = Player()
 ultron = Ultron(200, 200)
 
@@ -94,12 +127,14 @@ while running:
 
         # keyboard down
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_d: # moving right
+            if event.key == pygame.K_d:  # moving right
                 moving_right = True
-            elif event.key == pygame.K_a: # moving left
+            elif event.key == pygame.K_a:  # moving left
                 moving_left = True
             if event.key == pygame.K_w:
                 player.jump = True
+            if event.key == pygame.K_SPACE:
+                player.shoot = True
 
         # keyboard up
         if event.type == pygame.KEYUP:
