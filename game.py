@@ -107,7 +107,7 @@ class Ultron(Sprite):
         # health
         self.max_health = 100
         self.current_health = 100
-        self.health_bar = Ultron_Health(self.max_health)
+        self.health_bar = UltronHealth(self.max_health)
         self.alive = True
 
     def draw(self):
@@ -115,7 +115,7 @@ class Ultron(Sprite):
         self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
 
 
-class Ultron_Health():
+class UltronHealth:
     def __init__(self, max_health):
         self.max_health = max_health
 
@@ -123,12 +123,8 @@ class Ultron_Health():
         # draw max health
         pygame.draw.rect(screen, RED, (left, top - 20, width, 10))
         # draw actual health
-        ratio = healh/self.max_health
+        ratio = healh / self.max_health
         pygame.draw.rect(screen, BLUE, (left, top - 20, width * ratio, 10))
-
-
-
-
 
 
 laser = Laser()
