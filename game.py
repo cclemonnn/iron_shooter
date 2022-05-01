@@ -7,7 +7,7 @@ pygame.init()
 WIDTH = 1024
 HEIGHT = 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('mario shooter')
+pygame.display.set_caption('Iron Shooter')
 
 # colors
 GREEN = (0, 255, 0)
@@ -29,7 +29,7 @@ GRAVITY = 0.75
 running = True
 
 
-class Player(Sprite):
+class IronMan(Sprite):
     def __init__(self):
         super().__init__()
         self.images = []
@@ -128,7 +128,7 @@ class UltronHealth:
 
 
 laser = Laser()
-player = Player()
+player = IronMan()
 ultron = Ultron(200, 200)
 
 # game loop
