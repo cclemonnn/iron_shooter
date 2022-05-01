@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from pygame.sprite import Sprite, Group
 
@@ -13,6 +15,7 @@ pygame.display.set_caption('Iron Shooter')
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
 
 # player actions
 moving_right = False
@@ -122,9 +125,29 @@ class Ultron(Sprite):
         self.current_health = 100
         self.health_bar = UltronHealth(self.max_health)
         self.alive = True
+        # movement
+        self.delta_move = 0
+        self.moving_right = True
+        self.moving_left = False
 
     def update(self):
         if self.alive:
+            if self.moving_right and self.delta_move <= 200:
+                self.delta_move += 3
+                self.rect.x += 3
+            elif self.moving_right and self.delta_move > 200:
+                self.moving_right = False
+                self.moving_left = True
+                self.delta_move = 0
+                self.flip = True
+            if self.moving_left and self.delta_move <= 200:
+                self.delta_move += 3
+                self.rect.x -= 3
+            elif self.moving_left and self.delta_move > 200:
+                self.moving_right = True
+                self.moving_left = False
+                self.delta_move = 0
+                self.flip = False
             self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
         else:
             self.current_death_image += 0.15
@@ -134,7 +157,8 @@ class Ultron(Sprite):
                 self.image = self.death_images[5]
                 self.rect.bottom = self.bottom + 100
 
-
+    def draw(self):
+        screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
 
 class UltronHealth:
@@ -142,6 +166,8 @@ class UltronHealth:
         self.max_health = max_health
 
     def show_health_bar(self, left, top, width, health):
+        # draw health box boarder
+        pygame.draw.rect(screen, BLACK, (left - 2, top - 22, width + 4, 14))
         # draw max health
         pygame.draw.rect(screen, RED, (left, top - 20, width, 10))
         # draw actual health
@@ -151,7 +177,7 @@ class UltronHealth:
 
 laser = Laser()
 player = IronMan()
-ultron = Ultron(200, 500)
+ultron = Ultron(200, 450)
 ultron_group = Group()
 ultron_group.add(ultron)
 
@@ -162,12 +188,11 @@ while running:
     pygame.draw.line(screen, (0, 0, 0), (0, 500), (WIDTH, 500))
     player.move()
     ultron_group.update()
-    ultron_group.draw(screen)
+    for ul in ultron_group:
+        ul.draw()
     player.draw()
 
     # check collisions btw laser and ultron
-
-
 
     # handle events
     for event in pygame.event.get():
