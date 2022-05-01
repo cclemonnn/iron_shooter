@@ -1,5 +1,5 @@
 import pygame
-from pygame.sprite import Sprite
+from pygame.sprite import Sprite, Group
 
 pygame.init()
 
@@ -94,6 +94,13 @@ class Laser(Sprite):
             self.rect.y = player.rect.y + 5
         screen.blit(pygame.transform.flip(self.image, player.flip, False), self.rect)
 
+        # check collisions with ultron
+        ultron_shot = pygame.sprite.spritecollide(laser, ultron_group, False)
+        for ul in ultron_shot:
+            ul.current_health -= 0.5
+            if ul.current_health <= 0:
+                ul.alive = False
+
 
 class Ultron(Sprite):
     def __init__(self, x, y):
@@ -110,26 +117,28 @@ class Ultron(Sprite):
         self.health_bar = UltronHealth(self.max_health)
         self.alive = True
 
-    def draw(self):
-        screen.blit(self.image, self.rect)
-        self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
+    def update(self):
+        if self.alive:
+            self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
 
 
 class UltronHealth:
     def __init__(self, max_health):
         self.max_health = max_health
 
-    def show_health_bar(self, left, top, width, healh):
+    def show_health_bar(self, left, top, width, health):
         # draw max health
         pygame.draw.rect(screen, RED, (left, top - 20, width, 10))
         # draw actual health
-        ratio = healh / self.max_health
+        ratio = health / self.max_health
         pygame.draw.rect(screen, BLUE, (left, top - 20, width * ratio, 10))
 
 
 laser = Laser()
 player = IronMan()
 ultron = Ultron(200, 200)
+ultron_group = Group()
+ultron_group.add(ultron)
 
 # game loop
 while running:
@@ -137,8 +146,13 @@ while running:
     screen.fill(GREEN)
     pygame.draw.line(screen, (0, 0, 0), (0, 500), (WIDTH, 500))
     player.move()
-    ultron.draw()
+    ultron_group.update()
+    ultron_group.draw(screen)
     player.draw()
+
+    # check collisions btw laser and ultron
+
+
 
     # handle events
     for event in pygame.event.get():
