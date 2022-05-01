@@ -97,18 +97,24 @@ class Laser(Sprite):
         # check collisions with ultron
         ultron_shot = pygame.sprite.spritecollide(laser, ultron_group, False)
         for ul in ultron_shot:
-            ul.current_health -= 0.5
-            if ul.current_health <= 0:
-                ul.alive = False
+            if ul.alive:
+                ul.current_health -= 1
+                if ul.current_health <= 0:
+                    ul.alive = False
 
 
 class Ultron(Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, bottom):
         super().__init__()
+        self.death_images = []
+        self.current_death_image = 0
+        for i in range(6):
+            self.death_images.append(pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha())
         self.image = pygame.image.load('images/ultron/0.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
+        self.bottom = bottom
+        self.rect.bottom = self.bottom
         self.speed = 5
         self.flip = False
         # health
@@ -120,6 +126,15 @@ class Ultron(Sprite):
     def update(self):
         if self.alive:
             self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
+        else:
+            self.current_death_image += 0.15
+            if self.current_death_image < 5:
+                self.image = self.death_images[int(self.current_death_image)]
+            else:
+                self.image = self.death_images[5]
+                self.rect.bottom = self.bottom + 100
+
+
 
 
 class UltronHealth:
@@ -136,7 +151,7 @@ class UltronHealth:
 
 laser = Laser()
 player = IronMan()
-ultron = Ultron(200, 200)
+ultron = Ultron(200, 500)
 ultron_group = Group()
 ultron_group.add(ultron)
 
