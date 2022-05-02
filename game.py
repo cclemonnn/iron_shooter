@@ -1,15 +1,18 @@
 import random
-
+import settings
+from game_data import level_0
+from level import Level
 import pygame
 from pygame.sprite import Sprite, Group
 
 pygame.init()
 
 # screen
-WIDTH = 1024
-HEIGHT = 768
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 pygame.display.set_caption('Iron Shooter')
+
+# levels
+level = Level(level_0, screen)
 
 # colors
 GREEN = (0, 255, 0)
@@ -185,7 +188,7 @@ ultron_group.add(ultron)
 while running:
     clock.tick(FPS)
     screen.fill(GREEN)
-    pygame.draw.line(screen, (0, 0, 0), (0, 500), (WIDTH, 500))
+    pygame.draw.line(screen, (0, 0, 0), (0, 500), (settings.SCREEN_WIDTH, 500))
     player.move()
     ultron_group.update()
     for ul in ultron_group:
