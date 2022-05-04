@@ -188,6 +188,7 @@ ultron_group.add(ultron)
 while running:
     clock.tick(FPS)
     screen.fill(GREEN)
+    level.run()
     pygame.draw.line(screen, (0, 0, 0), (0, 500), (settings.SCREEN_WIDTH, 500))
     player.move()
     ultron_group.update()
