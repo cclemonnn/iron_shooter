@@ -35,6 +35,8 @@ GRAVITY = 0.75
 running = True
 
 
+
+
 class IronMan(Sprite):
     def __init__(self):
         super().__init__()
@@ -51,16 +53,20 @@ class IronMan(Sprite):
         self.jump = False
         self.in_air = False
         self.shoot = False
+        # restrict movement
+        self.total_movement = 0
 
     def move(self):
         if self.alive:
             if moving_right:
                 self.flip = False
-                # self.rect.x += self.speed
                 level.update(- player.speed)
+                self.total_movement += self.speed
+                # self.rect.x += self.speed
 
-            if moving_left:
+            if moving_left and self.total_movement > 0:
                 self.flip = True
+                self.total_movement -= player.speed
                 # self.rect.x -= self.speed
                 level.update(player.speed)
 

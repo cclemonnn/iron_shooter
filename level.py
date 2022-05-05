@@ -44,7 +44,6 @@ class Level:
                         sprite = StaticTile(TILE_SIZE, x, y, tile_surface)
                         sprite_group.add(sprite)
 
-
         return sprite_group
 
     def draw(self):
