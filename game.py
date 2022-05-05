@@ -56,10 +56,14 @@ class IronMan(Sprite):
         if self.alive:
             if moving_right:
                 self.flip = False
-                self.rect.x += self.speed
+                # self.rect.x += self.speed
+                level.update(- player.speed)
+
             if moving_left:
                 self.flip = True
-                self.rect.x -= self.speed
+                # self.rect.x -= self.speed
+                level.update(player.speed)
+
             if self.jump:
                 if self.rect.top > 5:
                     self.rect.y -= 5
@@ -69,6 +73,7 @@ class IronMan(Sprite):
             if self.rect.bottom >= 500:
                 self.in_air = False
                 self.rect.bottom = 500
+
 
     def draw(self):
         if not self.shoot:
@@ -188,7 +193,7 @@ ultron_group.add(ultron)
 while running:
     clock.tick(FPS)
     screen.fill(GREEN)
-    level.run()
+    level.draw()
     pygame.draw.line(screen, (0, 0, 0), (0, 500), (settings.SCREEN_WIDTH, 500))
     player.move()
     ultron_group.update()

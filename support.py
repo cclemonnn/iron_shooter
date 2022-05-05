@@ -29,7 +29,8 @@ def import_cut_graphics(image_path):
         for col in range(tile_x):
             x = col * TILE_SIZE
             y = row * TILE_SIZE
-            new_surface = Surface((TILE_SIZE, TILE_SIZE))
+            # flags = source alpha: set unused parts to invisible
+            new_surface = Surface((TILE_SIZE, TILE_SIZE), flags=pygame.SRCALPHA)
             new_surface.blit(surface, (0, 0), Rect(x, y, TILE_SIZE, TILE_SIZE))
             cut_tiles.append(new_surface)
 
