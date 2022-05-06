@@ -35,23 +35,23 @@ GRAVITY = 0.75
 running = True
 
 
-
-
 class IronMan(Sprite):
     def __init__(self):
         super().__init__()
         self.images = []
         for i in range(3):
-            self.images.append(pygame.image.load(f'images/iron_man/{i}.png').convert_alpha())
+            image = pygame.image.load(f'images/iron_man/{i}.png').convert_alpha()
+            image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
+            self.images.append(image)
         self.current_image = 0
         self.rect = self.images[self.current_image].get_rect()
         self.rect.x = 0
-        self.rect.bottom = 500
+        self.rect.bottom = 300
         self.speed = 5
         self.flip = False
         self.alive = True
         self.jump = False
-        self.in_air = False
+        self.on_ground = True
         self.shoot = False
         # restrict movement
         self.total_movement = 0
@@ -73,13 +73,14 @@ class IronMan(Sprite):
             if self.jump:
                 if self.rect.top > 5:
                     self.rect.y -= 5
-                    self.in_air = True
-            else:
-                self.rect.bottom += 7
-            if self.rect.bottom >= 500:
-                self.in_air = False
-                self.rect.bottom = 500
+                    self.on_ground = False
 
+            elif not self.on_ground:
+                self.rect.bottom += 7
+            # if self.rect.bottom >= 300:
+            #     self.in_air = False
+            #     level.check_collisions()
+            #     self.rect.bottom = 300
 
     def draw(self):
         if not self.shoot:
@@ -99,12 +100,13 @@ class IronMan(Sprite):
 class Laser(Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load(f'images/iron_man/3.png').convert_alpha()
+        image = pygame.image.load(f'images/iron_man/3.png').convert_alpha()
+        self.image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
         self.rect = self.image.get_rect()
 
     def shoot(self):
         if not player.flip:
-            self.rect.left = player.rect.right + 80
+            self.rect.left = player.rect.right + 40
             self.rect.y = player.rect.y + 5
         else:
             self.rect.right = player.rect.left + 10
@@ -202,6 +204,7 @@ while running:
     level.draw()
     pygame.draw.line(screen, (0, 0, 0), (0, 500), (settings.SCREEN_WIDTH, 500))
     player.move()
+    level.check_collisions(player)
     ultron_group.update()
     for ul in ultron_group:
         ul.draw()
