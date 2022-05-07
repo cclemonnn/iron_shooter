@@ -144,11 +144,10 @@ class Ultron(Sprite):
         self.current_death_image = 0
         for i in range(6):
             image = pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha()
-            image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
+            image = pygame.transform.scale(image, (image.get_width() // 1.5, image.get_height() // 1.5))
             self.death_images.append(image)
-            # self.death_images.append(pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha())
         image = pygame.image.load('images/ultron/0.png').convert_alpha()
-        self.image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
+        self.image = pygame.transform.scale(image, (image.get_width() // 1.5, image.get_height() // 1.5))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.bottom = bottom
@@ -164,21 +163,22 @@ class Ultron(Sprite):
         self.delta_move = 0
         self.moving_right = True
         self.moving_left = False
+        self.max_movement = random.randint(100, 250)
 
     def update(self):
         if self.alive:
-            if self.moving_right and self.delta_move <= 200:
+            if self.moving_right and self.delta_move <= self.max_movement:
                 self.delta_move += 3
                 self.rect.x += 3
-            elif self.moving_right and self.delta_move > 200:
+            elif self.moving_right and self.delta_move > self.max_movement:
                 self.moving_right = False
                 self.moving_left = True
                 self.delta_move = 0
                 self.flip = True
-            if self.moving_left and self.delta_move <= 200:
+            if self.moving_left and self.delta_move <= self.max_movement:
                 self.delta_move += 3
                 self.rect.x -= 3
-            elif self.moving_left and self.delta_move > 200:
+            elif self.moving_left and self.delta_move > self.max_movement:
                 self.moving_right = True
                 self.moving_left = False
                 self.delta_move = 0
@@ -190,7 +190,7 @@ class Ultron(Sprite):
                 self.image = self.death_images[int(self.current_death_image)]
             else:
                 self.image = self.death_images[5]
-                self.rect.bottom = self.bottom + 100
+                self.rect.bottom = self.bottom + 80
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -212,9 +212,15 @@ class UltronHealth:
 
 laser = Laser()
 player = IronMan()
-ultron = Ultron(200, 450)
+# x = tile size * tile position, y = tile size * tile position + 1
+ultron_0 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 5)
+ultron_1 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 10)
+ultron_2 = Ultron(settings.TILE_SIZE * 44 + 30, settings.TILE_SIZE * 3)
 ultron_group = Group()
-ultron_group.add(ultron)
+ultron_group.add(ultron_0)
+ultron_group.add(ultron_1)
+ultron_group.add(ultron_2)
+
 
 # game loop
 while running:
