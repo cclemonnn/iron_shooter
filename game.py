@@ -45,7 +45,7 @@ class IronMan(Sprite):
             self.images.append(image)
         self.current_image = 0
         self.rect = self.images[self.current_image].get_rect()
-        self.rect.x = 0
+        self.rect.x = 100
         self.rect.bottom = 300
         self.speed = 5
         self.flip = False
@@ -60,15 +60,24 @@ class IronMan(Sprite):
         if self.alive:
             if moving_right:
                 self.flip = False
-                level.update(- player.speed)
-                self.total_movement += self.speed
-                # self.rect.x += self.speed
+                if self.rect.x >= 100 \
+                        and settings.WORLD_WIDTH - (settings.SCREEN_WIDTH + self.rect.width) > self.total_movement >= 0:
+                    level.update(- player.speed)
+                    self.total_movement += self.speed
+                    # self.rect.x += self.speed
+                elif self.rect.right < settings.SCREEN_WIDTH - 100:
+                    # self.total_movement += self.speed
+                    self.rect.x += self.speed
 
-            if moving_left and self.total_movement > 0:
+            if moving_left: # and self.total_movement > 0:
                 self.flip = True
-                self.total_movement -= player.speed
-                # self.rect.x -= self.speed
-                level.update(player.speed)
+                if self.total_movement > 0:
+                    self.total_movement -= player.speed
+                    # self.rect.x -= self.speed
+                    level.update(player.speed)
+                elif self.rect.x > 0:
+                    # self.total_movement -= player.speed
+                    self.rect.x -= self.speed
 
             if self.jump:
                 if self.rect.top > 5:
@@ -202,7 +211,6 @@ while running:
     clock.tick(FPS)
     screen.fill(GREEN)
     level.draw()
-    pygame.draw.line(screen, (0, 0, 0), (0, 500), (settings.SCREEN_WIDTH, 500))
     player.move()
     level.check_collisions(player)
     ultron_group.update()
