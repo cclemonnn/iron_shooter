@@ -45,8 +45,10 @@ class IronMan(Sprite):
             self.images.append(image)
         self.current_image = 0
         self.rect = self.images[self.current_image].get_rect()
+        # starting position
         self.rect.x = 100
         self.rect.bottom = 300
+        # move speed
         self.speed = 5
         self.flip = False
         self.alive = True
@@ -56,25 +58,32 @@ class IronMan(Sprite):
         # restrict movement
         self.total_movement = 0
 
-    def move(self):
+    def move(self, ul_group):
         if self.alive:
             if moving_right:
                 self.flip = False
                 if self.rect.x >= 100 \
                         and settings.WORLD_WIDTH - (settings.SCREEN_WIDTH + self.rect.width) > self.total_movement >= 0:
-                    level.update(- player.speed)
+                    # shift world to left
+                    level.update(- self.speed)
+                    # shift all ultrons
+                    for ul in ul_group:
+                        ul.rect.x -= self.speed
                     self.total_movement += self.speed
-                    # self.rect.x += self.speed
+                # world reaches right side end, moves iron man only
                 elif self.rect.right < settings.SCREEN_WIDTH - 100:
-                    # self.total_movement += self.speed
                     self.rect.x += self.speed
 
-            if moving_left: # and self.total_movement > 0:
+            if moving_left:
                 self.flip = True
                 if self.total_movement > 0:
                     self.total_movement -= player.speed
-                    # self.rect.x -= self.speed
-                    level.update(player.speed)
+                    # shift world to right
+                    level.update(self.speed)
+                    # shift all ultrons
+                    for ul in ul_group:
+                        ul.rect.x += self.speed
+                # world reaches left side end, moves iron man only
                 elif self.rect.x > 0:
                     # self.total_movement -= player.speed
                     self.rect.x -= self.speed
@@ -86,10 +95,7 @@ class IronMan(Sprite):
 
             elif not self.on_ground:
                 self.rect.bottom += 7
-            # if self.rect.bottom >= 300:
-            #     self.in_air = False
-            #     level.check_collisions()
-            #     self.rect.bottom = 300
+
 
     def draw(self):
         if not self.shoot:
@@ -137,8 +143,12 @@ class Ultron(Sprite):
         self.death_images = []
         self.current_death_image = 0
         for i in range(6):
-            self.death_images.append(pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha())
-        self.image = pygame.image.load('images/ultron/0.png').convert_alpha()
+            image = pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha()
+            image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
+            self.death_images.append(image)
+            # self.death_images.append(pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha())
+        image = pygame.image.load('images/ultron/0.png').convert_alpha()
+        self.image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.bottom = bottom
@@ -211,7 +221,7 @@ while running:
     clock.tick(FPS)
     screen.fill(GREEN)
     level.draw()
-    player.move()
+    player.move(ultron_group)
     level.check_collisions(player)
     ultron_group.update()
     for ul in ultron_group:
