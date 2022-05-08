@@ -97,7 +97,7 @@ class IronMan(Sprite):
                     self.rect.y -= 5
                     self.on_ground = False
 
-            elif not self.on_ground:
+            elif not self.on_ground and self.rect.bottom < settings.SCREEN_HEIGHT - 7:
                 self.rect.bottom += 7
 
 

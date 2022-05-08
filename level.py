@@ -28,6 +28,10 @@ class Level:
         palms_1_layout = import_csv_layout(level_data['palms_1'])
         self.palms_1_sprites = self.create_tile_group(palms_1_layout, 'palms_1')
 
+        # lava
+        lava_layout = import_csv_layout(level_data['lava'])
+        self.lava_sprites = self.create_tile_group(lava_layout, 'lava')
+
     def create_tile_group(self, layout, image_type):
         sprite_group = Group()
 
@@ -61,6 +65,12 @@ class Level:
                         sprite = StaticTile(TILE_SIZE, x, y, tile_surface)
                         sprite_group.add(sprite)
 
+                    elif image_type == 'lava':
+                        lava_image_list = import_cut_graphics('images/lava/lava.png')
+                        tile_surface = lava_image_list[int(item)]
+                        sprite = StaticTile(TILE_SIZE, x, y, tile_surface)
+                        sprite_group.add(sprite)
+
         return sprite_group
 
     def draw(self):
@@ -72,6 +82,8 @@ class Level:
         self.palms_sprites.draw(self.display_surface)
         # draw palms_1
         self.palms_1_sprites.draw(self.display_surface)
+        # draw lava
+        self.lava_sprites.draw(self.display_surface)
 
 
     def update(self, movement):
@@ -83,6 +95,8 @@ class Level:
         self.palms_sprites.update(movement)
         # update palms_1
         self.palms_1_sprites.update(movement)
+        # update lava
+        self.lava_sprites.update(movement)
 
     def check_collisions(self, iron_man):
         collisions = pygame.sprite.spritecollide(iron_man, self.grass_sprites, False)
