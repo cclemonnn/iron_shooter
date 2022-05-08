@@ -19,6 +19,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
+ORANGE_RED = (255, 69, 0)
 
 # player actions
 moving_right = False
@@ -57,6 +58,9 @@ class IronMan(Sprite):
         self.shoot = False
         # restrict movement
         self.total_movement = 0
+        # health
+        self.max_health = 100
+        self.health = 100
 
     def move(self, ul_group):
         if self.alive:
@@ -110,6 +114,15 @@ class IronMan(Sprite):
                 self.shoot = False
             else:
                 screen.blit(pygame.transform.flip(self.images[int(self.current_image)], self.flip, False), self.rect)
+
+    def draw_health_bar(self):
+        # draw health box boarder
+        pygame.draw.rect(screen, BLACK, (8, 18, 204, 14))
+        # draw max health
+        pygame.draw.rect(screen, RED, (10, 20, 200, 10))
+        # draw actual health
+        ratio = self.health / self.max_health
+        pygame.draw.rect(screen, ORANGE_RED, (10, 20, 200 * ratio, 10))
 
 
 class Laser(Sprite):
@@ -216,10 +229,15 @@ player = IronMan()
 ultron_0 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 5)
 ultron_1 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 10)
 ultron_2 = Ultron(settings.TILE_SIZE * 44 + 30, settings.TILE_SIZE * 3)
+ultron_3 = Ultron(settings.TILE_SIZE * 40 + 30, settings.TILE_SIZE * 6)
+
+
 ultron_group = Group()
 ultron_group.add(ultron_0)
 ultron_group.add(ultron_1)
 ultron_group.add(ultron_2)
+ultron_group.add(ultron_3)
+
 
 
 # game loop
@@ -227,6 +245,7 @@ while running:
     clock.tick(FPS)
     screen.fill(GREEN)
     level.draw()
+    player.draw_health_bar()
     player.move(ultron_group)
     level.check_collisions(player)
     ultron_group.update()
