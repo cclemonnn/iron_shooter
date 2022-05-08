@@ -3,5 +3,5 @@ level_0 = {
     'grass'     : 'levels/0/level_0_grass.csv',
     'palms'     : 'levels/0/level_0_palms.csv',
     'palms_1'   : 'levels/0/level_0_palms_1.csv',
-    'lava'      : 'levels/0/level_0_lava.csv'
+    'lava'      : 'levels/0/level_0_lava.csv',
 }

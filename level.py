@@ -32,6 +32,7 @@ class Level:
         lava_layout = import_csv_layout(level_data['lava'])
         self.lava_sprites = self.create_tile_group(lava_layout, 'lava')
 
+
     def create_tile_group(self, layout, image_type):
         sprite_group = Group()
 
@@ -70,6 +71,7 @@ class Level:
                         tile_surface = lava_image_list[int(item)]
                         sprite = StaticTile(TILE_SIZE, x, y, tile_surface)
                         sprite_group.add(sprite)
+
 
         return sprite_group
 

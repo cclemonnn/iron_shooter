@@ -150,6 +150,17 @@ class Laser(Sprite):
                     ul.alive = False
 
 
+class Ground(Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('images/sky/sky.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
 class Ultron(Sprite):
     def __init__(self, x, bottom):
         super().__init__()
@@ -238,12 +249,15 @@ ultron_group.add(ultron_1)
 ultron_group.add(ultron_2)
 ultron_group.add(ultron_3)
 
+ground = Ground()
+
 
 
 # game loop
 while running:
     clock.tick(FPS)
     screen.fill(GREEN)
+    ground.draw()
     level.draw()
     player.draw_health_bar()
     player.move(ultron_group)
