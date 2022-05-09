@@ -101,14 +101,22 @@ class Level:
         self.lava_sprites.update(movement)
 
     def check_collisions(self, iron_man):
-        collisions = pygame.sprite.spritecollide(iron_man, self.grass_sprites, False)
-        if len(collisions) == 0:
+        # check iron man collisions with grass
+        grass_collisions = pygame.sprite.spritecollide(iron_man, self.grass_sprites, False)
+        if len(grass_collisions) == 0:
             iron_man.on_ground = False
         else:
-            for grass in collisions:
+            for grass in grass_collisions:
                 if grass.rect.centery +20 < iron_man.rect.bottom <= grass.rect.bottom:
                     iron_man.on_ground = True
 
+        # check iron man collisions with lava
+        lava_collisions = pygame.sprite.spritecollide(iron_man, self.lava_sprites, False)
+        if len(lava_collisions) == 0:
+            pass
+        else:
+            for lava in lava_collisions:
+                iron_man.health -= 0.5
 
 
 

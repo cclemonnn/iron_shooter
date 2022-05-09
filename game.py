@@ -62,7 +62,13 @@ class IronMan(Sprite):
         self.max_health = 100
         self.health = 100
 
-    def move(self, ul_group, background):
+        # icon image
+        icon = pygame.image.load('images/iron_man/ironman_icon.png').convert_alpha()
+        self.icon_image = pygame.transform.scale(icon, (icon.get_width() // 1.7, icon.get_height() // 1.7))
+        self.icon_rect = self.icon_image.get_rect()
+        self.icon_rect.topleft = (0, 10)
+
+    def move(self, ul_group):
         if self.alive:
             if moving_right:
                 self.flip = False
@@ -74,8 +80,6 @@ class IronMan(Sprite):
                     for ul in ul_group:
                         ul.rect.x -= self.speed
                     self.total_movement += self.speed
-                    # scrolls background
-                    background.update(-self.speed)
                 # world reaches right side end, moves iron man only
                 elif self.rect.right < settings.SCREEN_WIDTH - 100:
                     self.rect.x += self.speed
@@ -89,8 +93,6 @@ class IronMan(Sprite):
                     # scrolls all ultrons
                     for ul in ul_group:
                         ul.rect.x += self.speed
-                    # scrolls background
-                    background.update(self.speed)
                 # world reaches left side end, moves iron man only
                 elif self.rect.x > 0:
                     # self.total_movement -= player.speed
@@ -122,12 +124,19 @@ class IronMan(Sprite):
 
     def draw_health_bar(self):
         # draw health box boarder
-        pygame.draw.rect(screen, BLACK, (8, 18, 204, 14))
+        pygame.draw.rect(screen, BLACK, (58, 23, 204, 14))
         # draw max health
-        pygame.draw.rect(screen, RED, (10, 20, 200, 10))
+        pygame.draw.rect(screen, RED, (60, 25, 200, 10))
         # draw actual health
         ratio = self.health / self.max_health
-        pygame.draw.rect(screen, ORANGE_RED, (10, 20, 200 * ratio, 10))
+        pygame.draw.rect(screen, BLUE, (60, 25, 200 * ratio, 10))
+
+    def draw_icon(self):
+        screen.blit(self.icon_image, self.icon_rect)
+
+    def check_alive(self):
+        if self.health <= 0:
+            self.alive = False
 
 
 class Laser(Sprite):
@@ -160,7 +169,7 @@ class Ground(Sprite):
         super().__init__()
         self.image = pygame.image.load('images/sky/sky_1.png').convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.x = 0
+        self.rect.x = -1500
         self.rect.y = -2700
 
     def update(self, movement):
@@ -268,7 +277,9 @@ while running:
     ground.draw()
     level.draw()
     player.draw_health_bar()
-    player.move(ultron_group, ground)
+    player.draw_icon()
+    player.check_alive()
+    player.move(ultron_group)
     level.check_collisions(player)
     ultron_group.update()
     for ul in ultron_group:
@@ -283,24 +294,25 @@ while running:
             running = False
 
         # keyboard down
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_d:  # moving right
-                moving_right = True
-            elif event.key == pygame.K_a:  # moving left
-                moving_left = True
-            if event.key == pygame.K_w:
-                player.jump = True
-            if event.key == pygame.K_SPACE:
-                player.shoot = True
+        if player.alive:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_d:  # moving right
+                    moving_right = True
+                elif event.key == pygame.K_a:  # moving left
+                    moving_left = True
+                if event.key == pygame.K_w:
+                    player.jump = True
+                if event.key == pygame.K_SPACE:
+                    player.shoot = True
 
         # keyboard up
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_d:
-                moving_right = False
-            elif event.key == pygame.K_a:
-                moving_left = False
-            elif event.key == pygame.K_w:
-                player.jump = False
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_d:
+                    moving_right = False
+                elif event.key == pygame.K_a:
+                    moving_left = False
+                elif event.key == pygame.K_w:
+                    player.jump = False
 
     pygame.display.update()
 
