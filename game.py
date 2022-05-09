@@ -62,18 +62,20 @@ class IronMan(Sprite):
         self.max_health = 100
         self.health = 100
 
-    def move(self, ul_group):
+    def move(self, ul_group, background):
         if self.alive:
             if moving_right:
                 self.flip = False
                 if self.rect.x >= 100 \
                         and settings.WORLD_WIDTH - (settings.SCREEN_WIDTH + self.rect.width) > self.total_movement >= 0:
-                    # shift world to left
+                    # scrolls world to left
                     level.update(- self.speed)
-                    # shift all ultrons
+                    # scrolls all ultrons
                     for ul in ul_group:
                         ul.rect.x -= self.speed
                     self.total_movement += self.speed
+                    # scrolls background
+                    background.update(-self.speed)
                 # world reaches right side end, moves iron man only
                 elif self.rect.right < settings.SCREEN_WIDTH - 100:
                     self.rect.x += self.speed
@@ -82,11 +84,13 @@ class IronMan(Sprite):
                 self.flip = True
                 if self.total_movement > 0:
                     self.total_movement -= player.speed
-                    # shift world to right
+                    # scrolls world to right
                     level.update(self.speed)
-                    # shift all ultrons
+                    # scrolls all ultrons
                     for ul in ul_group:
                         ul.rect.x += self.speed
+                    # scrolls background
+                    background.update(self.speed)
                 # world reaches left side end, moves iron man only
                 elif self.rect.x > 0:
                     # self.total_movement -= player.speed
@@ -97,6 +101,7 @@ class IronMan(Sprite):
                     self.rect.y -= 5
                     self.on_ground = False
 
+            # iron man falls if in air
             elif not self.on_ground and self.rect.bottom < settings.SCREEN_HEIGHT - 7:
                 self.rect.bottom += 7
 
@@ -153,10 +158,13 @@ class Laser(Sprite):
 class Ground(Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('images/sky/sky.png').convert_alpha()
+        self.image = pygame.image.load('images/sky/sky_1.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = 0
-        self.rect.y = 0
+        self.rect.y = -2700
+
+    def update(self, movement):
+        self.rect.x += movement
 
     def draw(self):
         screen.blit(self.image, self.rect)
@@ -260,7 +268,7 @@ while running:
     ground.draw()
     level.draw()
     player.draw_health_bar()
-    player.move(ultron_group)
+    player.move(ultron_group, ground)
     level.check_collisions(player)
     ultron_group.update()
     for ul in ultron_group:
