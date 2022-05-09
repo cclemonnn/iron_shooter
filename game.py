@@ -20,6 +20,8 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 ORANGE_RED = (255, 69, 0)
+ORANGE = (255, 165, 0)
+SPRING_GREEN = (0, 255, 127)
 
 # player actions
 moving_right = False
@@ -62,6 +64,10 @@ class IronMan(Sprite):
         self.max_health = 100
         self.health = 100
 
+        # energy
+        self.max_energy = 100
+        self.energy = 100
+
         # flight
         self.flight_image = pygame.image.load('images/iron_man/flight_1.png').convert_alpha()
         self.flight_rect = self.flight_image.get_rect()
@@ -71,7 +77,7 @@ class IronMan(Sprite):
         icon = pygame.image.load('images/iron_man/ironman_icon.png').convert_alpha()
         self.icon_image = pygame.transform.scale(icon, (icon.get_width() // 1.7, icon.get_height() // 1.7))
         self.icon_rect = self.icon_image.get_rect()
-        self.icon_rect.topleft = (0, 10)
+        self.icon_rect.topleft = (0, 0)
 
     def move(self, ul_group):
         if self.alive:
@@ -103,7 +109,8 @@ class IronMan(Sprite):
                     # self.total_movement -= player.speed
                     self.rect.x -= self.speed
 
-            if self.jump:
+            if self.jump and self.energy > 0:
+                self.energy -= 1
                 if self.rect.top > 5:
                     self.rect.y -= 5
                     self.on_ground = False
@@ -112,6 +119,8 @@ class IronMan(Sprite):
             elif not self.on_ground and self.rect.bottom < settings.SCREEN_HEIGHT - 7:
                 self.rect.bottom += 7
 
+            if self.on_ground and self.energy < self.max_energy:
+                self.energy += 2
 
     def draw(self):
         if not self.shoot:
@@ -128,7 +137,7 @@ class IronMan(Sprite):
                 screen.blit(pygame.transform.flip(self.images[int(self.current_image)], self.flip, False), self.rect)
 
     def draw_flight(self):
-        if self.jump:
+        if self.jump and player.energy > 0:
             self.flight_rect.midtop = (self.rect.centerx, self.rect.bottom + 10)
             screen.blit(self.flight_image, self.flight_rect)
 
@@ -140,10 +149,19 @@ class IronMan(Sprite):
         pygame.draw.rect(screen, RED, (60, 25, 200, 10))
         # draw actual health
         ratio = self.health / self.max_health
-        pygame.draw.rect(screen, BLUE, (60, 25, 200 * ratio, 10))
+        pygame.draw.rect(screen, SPRING_GREEN, (60, 25, 200 * ratio, 10))
 
     def draw_icon(self):
         screen.blit(self.icon_image, self.icon_rect)
+
+    def draw_energy_bar(self):
+        # draw energy box boarder
+        pygame.draw.rect(screen, BLACK, (58, 53, 204, 14))
+        # draw max energy
+        pygame.draw.rect(screen, RED, (60, 55, 200, 10))
+        # draw actual energy
+        ratio = self.energy / self.max_energy
+        pygame.draw.rect(screen, ORANGE, (60, 55, 200 * ratio, 10))
 
     def check_alive(self):
         if self.health <= 0:
@@ -288,6 +306,7 @@ while running:
     ground.draw()
     level.draw()
     player.draw_health_bar()
+    player.draw_energy_bar()
     player.draw_icon()
     player.check_alive()
     player.move(ultron_group)
