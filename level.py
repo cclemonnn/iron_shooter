@@ -76,6 +76,8 @@ class Level:
         return sprite_group
 
     def draw(self):
+        # draw lava
+        self.lava_sprites.draw(self.display_surface)
         # draw terrain
         self.terrain_sprites.draw(self.display_surface)
         # draw grass
@@ -84,8 +86,7 @@ class Level:
         self.palms_sprites.draw(self.display_surface)
         # draw palms_1
         self.palms_1_sprites.draw(self.display_surface)
-        # draw lava
-        self.lava_sprites.draw(self.display_surface)
+
 
 
     def update(self, movement):

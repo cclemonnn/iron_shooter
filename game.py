@@ -72,12 +72,18 @@ class IronMan(Sprite):
         self.flight_image = pygame.image.load('images/iron_man/flight_1.png').convert_alpha()
         self.flight_rect = self.flight_image.get_rect()
 
-
         # icon image
         icon = pygame.image.load('images/iron_man/ironman_icon.png').convert_alpha()
         self.icon_image = pygame.transform.scale(icon, (icon.get_width() // 1.7, icon.get_height() // 1.7))
         self.icon_rect = self.icon_image.get_rect()
         self.icon_rect.topleft = (0, 0)
+
+        # energy image
+        energy = pygame.image.load('images/iron_man/energy.png').convert_alpha()
+        self.energy_image = pygame.transform.scale(energy, (energy.get_width() // 1.7, energy.get_height() // 1.7))
+        self.energy_rect = self.energy_image.get_rect()
+        self.energy_rect.y = 60
+        self.energy_rect.right = self.icon_rect.right
 
     def move(self, ul_group):
         if self.alive:
@@ -144,24 +150,27 @@ class IronMan(Sprite):
 
     def draw_health_bar(self):
         # draw health box boarder
-        pygame.draw.rect(screen, BLACK, (58, 23, 204, 14))
+        pygame.draw.rect(screen, BLACK, (58, 15, 204, 19))
         # draw max health
-        pygame.draw.rect(screen, RED, (60, 25, 200, 10))
+        pygame.draw.rect(screen, RED, (60, 17, 200, 15))
         # draw actual health
         ratio = self.health / self.max_health
-        pygame.draw.rect(screen, SPRING_GREEN, (60, 25, 200 * ratio, 10))
+        pygame.draw.rect(screen, SPRING_GREEN, (60, 17, 200 * ratio, 15))
 
     def draw_icon(self):
         screen.blit(self.icon_image, self.icon_rect)
 
     def draw_energy_bar(self):
         # draw energy box boarder
-        pygame.draw.rect(screen, BLACK, (58, 53, 204, 14))
+        pygame.draw.rect(screen, BLACK, (58, 63, 104, 14))
         # draw max energy
-        pygame.draw.rect(screen, RED, (60, 55, 200, 10))
+        pygame.draw.rect(screen, RED, (60, 65, 100, 10))
         # draw actual energy
         ratio = self.energy / self.max_energy
-        pygame.draw.rect(screen, ORANGE, (60, 55, 200 * ratio, 10))
+        pygame.draw.rect(screen, ORANGE, (60, 65, 100 * ratio, 10))
+
+    def draw_energy_icon(self):
+        screen.blit(self.energy_image, self.energy_rect)
 
     def check_alive(self):
         if self.health <= 0:
@@ -308,6 +317,7 @@ while running:
     player.draw_health_bar()
     player.draw_energy_bar()
     player.draw_icon()
+    player.draw_energy_icon()
     player.check_alive()
     player.move(ultron_group)
     player.draw_flight()
