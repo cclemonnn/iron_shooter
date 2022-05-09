@@ -62,6 +62,11 @@ class IronMan(Sprite):
         self.max_health = 100
         self.health = 100
 
+        # flight
+        self.flight_image = pygame.image.load('images/iron_man/flight_1.png').convert_alpha()
+        self.flight_rect = self.flight_image.get_rect()
+
+
         # icon image
         icon = pygame.image.load('images/iron_man/ironman_icon.png').convert_alpha()
         self.icon_image = pygame.transform.scale(icon, (icon.get_width() // 1.7, icon.get_height() // 1.7))
@@ -121,6 +126,12 @@ class IronMan(Sprite):
                 self.shoot = False
             else:
                 screen.blit(pygame.transform.flip(self.images[int(self.current_image)], self.flip, False), self.rect)
+
+    def draw_flight(self):
+        if self.jump:
+            self.flight_rect.midtop = (self.rect.centerx, self.rect.bottom + 10)
+            screen.blit(self.flight_image, self.flight_rect)
+
 
     def draw_health_bar(self):
         # draw health box boarder
@@ -280,6 +291,7 @@ while running:
     player.draw_icon()
     player.check_alive()
     player.move(ultron_group)
+    player.draw_flight()
     level.check_collisions(player)
     ultron_group.update()
     for ul in ultron_group:
