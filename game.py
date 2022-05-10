@@ -1,4 +1,7 @@
 import random
+
+from pygame.surface import Surface
+
 import settings
 from game_data import level_0
 from level import Level
@@ -192,7 +195,7 @@ class Laser(Sprite):
             self.rect.right = player.rect.left + 10
             self.rect.y = player.rect.y + 5
         screen.blit(pygame.transform.flip(self.image, player.flip, False), self.rect)
-
+        # player.energy -= 1 (could let shooting cost energy if added this code)
         # check collisions with ultron
         ultron_shot = pygame.sprite.spritecollide(laser, ultron_group, False)
         for ul in ultron_shot:
@@ -219,14 +222,23 @@ class Ground(Sprite):
 class Ultron(Sprite):
     def __init__(self, x, bottom):
         super().__init__()
+        # death images
         self.death_images = []
         self.current_death_image = 0
         for i in range(6):
             image = pygame.image.load(f'images/ultron_death/{i}.png').convert_alpha()
             image = pygame.transform.scale(image, (image.get_width() // 1.5, image.get_height() // 1.5))
             self.death_images.append(image)
-        image = pygame.image.load('images/ultron/0.png').convert_alpha()
-        self.image = pygame.transform.scale(image, (image.get_width() // 1.5, image.get_height() // 1.5))
+        # shoot image
+        self.shoot_image = []
+        self.current_shoot_image = 0
+        for i in range(3):
+            image = pygame.image.load(f'images/ultron/{i}.png').convert_alpha()
+            image = pygame.transform.scale(image, (image.get_width() // 1.5, image.get_height() // 1.5))
+            self.shoot_image.append(image)
+        # static image
+        # image = pygame.image.load(f'images/ultron/0.png').convert_alpha()
+        self.image = self.shoot_image[0]
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.bottom = bottom
@@ -244,8 +256,14 @@ class Ultron(Sprite):
         self.moving_left = False
         self.max_movement = random.randint(100, 250)
 
+        # vision
+        self.vision_surf = Surface((settings.SCREEN_WIDTH // 2, 10))
+        self.vision_surf.fill(GREEN)
+        self.vision_rect = self.vision_surf.get_rect()
+        self.shoot = False
+
     def update(self):
-        if self.alive:
+        if self.alive and not self.shoot:
             if self.moving_right and self.delta_move <= self.max_movement:
                 self.delta_move += 3
                 self.rect.x += 3
@@ -263,16 +281,37 @@ class Ultron(Sprite):
                 self.delta_move = 0
                 self.flip = False
             self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
-        else:
+        elif not self.alive:
             self.current_death_image += 0.15
             if self.current_death_image < 5:
                 self.image = self.death_images[int(self.current_death_image)]
             else:
                 self.image = self.death_images[5]
                 self.rect.bottom = self.bottom + 80
+        elif self.alive and self.shoot:
+            self.current_shoot_image += 0.1
+            if self.current_shoot_image < 3:
+                self.image = self.shoot_image[int(self.current_shoot_image)]
+            else:
+                self.current_shoot_image = 0
+                self.image = self.shoot_image[int(self.current_shoot_image)]
+                self.shoot = False
+            self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
+
+    def check_vision(self, iron_man):
+        # position the vision rect
+        if not self.flip:
+            self.vision_rect.midleft = self.rect.midright
+        else: # facing left
+            self.vision_rect.midright = self.rect.midleft
+        # check if player in ultron's vision
+        if self.vision_rect.colliderect(iron_man.rect):
+            self.shoot = True
+
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
+        screen.blit(self.vision_surf, self.vision_rect)
 
 
 class UltronHealth:
@@ -324,10 +363,9 @@ while running:
     level.check_collisions(player)
     ultron_group.update()
     for ul in ultron_group:
+        ul.check_vision(player)
         ul.draw()
     player.draw()
-
-    # check collisions btw laser and ultron
 
     # handle events
     for event in pygame.event.get():
