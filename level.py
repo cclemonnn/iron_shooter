@@ -116,8 +116,9 @@ class Level:
         if len(lava_collisions) == 0:
             pass
         else:
-            for lava in lava_collisions:
-                iron_man.health -= 0.5
+            if iron_man.health >= 0:
+                for lava in lava_collisions:
+                    iron_man.health -= 0.5
 
 
 

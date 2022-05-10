@@ -119,7 +119,7 @@ class IronMan(Sprite):
                     self.rect.x -= self.speed
 
             if self.jump and self.energy > 0:
-                self.energy -= 1
+                self.energy -= 0.5
                 if self.rect.top > 5:
                     self.rect.y -= 5
                     self.on_ground = False
@@ -138,7 +138,7 @@ class IronMan(Sprite):
             self.current_image += 0.15
             if 9 > self.current_image > 2:
                 screen.blit(pygame.transform.flip(self.images[2], self.flip, False), self.rect)
-                laser.shoot()
+                iron_man_laser.shoot()
             elif self.current_image >= 9:
                 self.current_image = 0
                 self.shoot = False
@@ -180,7 +180,7 @@ class IronMan(Sprite):
             self.alive = False
 
 
-class Laser(Sprite):
+class IronManLaser(Sprite):
     def __init__(self):
         super().__init__()
         image = pygame.image.load(f'images/iron_man/3.png').convert_alpha()
@@ -197,7 +197,7 @@ class Laser(Sprite):
         screen.blit(pygame.transform.flip(self.image, player.flip, False), self.rect)
         # player.energy -= 1 (could let shooting cost energy if added this code)
         # check collisions with ultron
-        ultron_shot = pygame.sprite.spritecollide(laser, ultron_group, False)
+        ultron_shot = pygame.sprite.spritecollide(iron_man_laser, ultron_group, False)
         for ul in ultron_shot:
             if ul.alive:
                 ul.current_health -= 1
@@ -258,7 +258,7 @@ class Ultron(Sprite):
 
         # vision
         self.vision_surf = Surface((settings.SCREEN_WIDTH // 2, 10))
-        self.vision_surf.fill(GREEN)
+        self.vision_surf.fill(RED)
         self.vision_rect = self.vision_surf.get_rect()
         self.shoot = False
 
@@ -297,6 +297,7 @@ class Ultron(Sprite):
                 self.image = self.shoot_image[int(self.current_shoot_image)]
                 self.shoot = False
             self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
+            ultron_laser_group.add(UltronLaser(self))
 
     def check_vision(self, iron_man):
         # position the vision rect
@@ -314,6 +315,31 @@ class Ultron(Sprite):
         screen.blit(self.vision_surf, self.vision_rect)
 
 
+class UltronLaser(Sprite):
+    def __init__(self, ultron):
+        super().__init__()
+        image = pygame.image.load('images/ultron_laser/lightsaber_green.png').convert_alpha()
+        self.image = pygame.transform.scale(image, (image.get_width() // 4, image.get_height() // 4))
+        self.rect = self.image.get_rect()
+        self.speed = 5
+        if not ultron.flip:
+            self.right = True
+            self.rect.midleft = ultron.rect.midright
+        else:
+            self.right = False
+            self.rect.midright = ultron.rect.midleft
+
+    def update(self):
+        if self.right:
+            self.rect.x += self.speed
+        else:
+            self.rect.x -= self.speed
+        if self.rect.left >= settings.SCREEN_WIDTH or self.rect.right < 0:
+            self.kill()
+
+
+
+
 class UltronHealth:
     def __init__(self, max_health):
         self.max_health = max_health
@@ -328,7 +354,7 @@ class UltronHealth:
         pygame.draw.rect(screen, BLUE, (left, top - 20, width * ratio, 10))
 
 
-laser = Laser()
+iron_man_laser = IronManLaser()
 player = IronMan()
 # x = tile size * tile position, y = tile size * tile position + 1
 ultron_0 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 5)
@@ -344,6 +370,8 @@ ultron_group.add(ultron_2)
 ultron_group.add(ultron_3)
 
 ground = Ground()
+
+ultron_laser_group = Group()
 
 
 
@@ -365,6 +393,8 @@ while running:
     for ul in ultron_group:
         ul.check_vision(player)
         ul.draw()
+    ultron_laser_group.update()
+    ultron_laser_group.draw(screen)
     player.draw()
 
     # handle events
