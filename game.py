@@ -307,15 +307,18 @@ class Ultron(Sprite):
             self.current_shoot_image += 0.1
             if self.current_shoot_image < 2 and self.can_shoot:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
-            elif 2 <= self.current_shoot_image < 3 and self.can_shoot:
+            elif 2 <= self.current_shoot_image < 3: # and self.can_shoot:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
-                ultron_laser_group.add(UltronLaser(self))
-                self.can_shoot = False
+                # ultron_laser_group.add(UltronLaser(self))
+                # self.can_shoot = False
             else:
                 self.current_shoot_image = 0
-                self.can_shoot = True
+                # self.can_shoot = True
                 self.image = self.shoot_image[int(self.current_shoot_image)]
                 self.shoot = False
+                self.can_shoot = False
+            if 2 <= self.current_shoot_image < 3 and self.can_shoot:
+                ultron_laser_group.add(UltronLaser(self))
                 self.can_shoot = False
 
             self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
