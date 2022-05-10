@@ -100,6 +100,9 @@ class IronMan(Sprite):
                     for ul in ul_group:
                         ul.rect.x -= self.speed
                     self.total_movement += self.speed
+                    # scrolls ultron laser
+                    for laser in ultron_laser_group:
+                        laser.rect.x -= self.speed
                 # world reaches right side end, moves iron man only
                 elif self.rect.right < settings.SCREEN_WIDTH - 100:
                     self.rect.x += self.speed
@@ -113,6 +116,9 @@ class IronMan(Sprite):
                     # scrolls all ultrons
                     for ul in ul_group:
                         ul.rect.x += self.speed
+                    # scrolls ultron laser
+                    for laser in ultron_laser_group:
+                        laser.rect.x += self.speed
                 # world reaches left side end, moves iron man only
                 elif self.rect.x > 0:
                     # self.total_movement -= player.speed
@@ -262,7 +268,16 @@ class Ultron(Sprite):
         self.vision_rect = self.vision_surf.get_rect()
         self.shoot = False
 
+        # time used to restrict shooting frequency
+        self.time = pygame.time.get_ticks()
+        self.can_shoot = False
+
     def update(self):
+        # current_time = pygame.time.get_ticks()
+        # if current_time > self.time + 300:
+        #     self.time = current_time
+        #     self.can_shoot = True
+
         if self.alive and not self.shoot:
             if self.moving_right and self.delta_move <= self.max_movement:
                 self.delta_move += 3
@@ -290,14 +305,19 @@ class Ultron(Sprite):
                 self.rect.bottom = self.bottom + 80
         elif self.alive and self.shoot:
             self.current_shoot_image += 0.1
-            if self.current_shoot_image < 3:
+            if self.current_shoot_image < 2:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
+            elif 2 <= self.current_shoot_image < 3:
+                self.image = self.shoot_image[int(self.current_shoot_image)]
+                ultron_laser_group.add(UltronLaser(self))
             else:
                 self.current_shoot_image = 0
                 self.image = self.shoot_image[int(self.current_shoot_image)]
                 self.shoot = False
+                self.can_shoot = False
+
             self.health_bar.show_health_bar(self.rect.left, self.rect.top, self.rect.width, self.current_health)
-            ultron_laser_group.add(UltronLaser(self))
+            # ultron_laser_group.add(UltronLaser(self))
 
     def check_vision(self, iron_man):
         # position the vision rect
