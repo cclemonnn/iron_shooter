@@ -270,13 +270,13 @@ class Ultron(Sprite):
 
         # time used to restrict shooting frequency
         self.time = pygame.time.get_ticks()
-        self.can_shoot = False
+        self.can_shoot = True
 
     def update(self):
-        # current_time = pygame.time.get_ticks()
-        # if current_time > self.time + 300:
-        #     self.time = current_time
-        #     self.can_shoot = True
+        current_time = pygame.time.get_ticks()
+        if current_time > self.time + 800:
+            self.time = current_time
+            self.can_shoot = True
 
         if self.alive and not self.shoot:
             if self.moving_right and self.delta_move <= self.max_movement:
@@ -305,13 +305,15 @@ class Ultron(Sprite):
                 self.rect.bottom = self.bottom + 80
         elif self.alive and self.shoot:
             self.current_shoot_image += 0.1
-            if self.current_shoot_image < 2:
+            if self.current_shoot_image < 2 and self.can_shoot:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
-            elif 2 <= self.current_shoot_image < 3:
+            elif 2 <= self.current_shoot_image < 3 and self.can_shoot:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
                 ultron_laser_group.add(UltronLaser(self))
+                self.can_shoot = False
             else:
                 self.current_shoot_image = 0
+                self.can_shoot = True
                 self.image = self.shoot_image[int(self.current_shoot_image)]
                 self.shoot = False
                 self.can_shoot = False
