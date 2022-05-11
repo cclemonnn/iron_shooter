@@ -372,11 +372,10 @@ class UltronLaser(Sprite):
             self.rect.x -= self.speed
         if self.rect.left >= settings.SCREEN_WIDTH or self.rect.right < 0:
             self.kill()
-        # check collision with iron man
+        # check collision with iron man reduce health if hit
         if iron_man.alive and self.rect.colliderect(iron_man.rect):
             self.kill()
-            iron_man.health -= 10
-
+            iron_man.health -= 15
 
 
 
