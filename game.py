@@ -34,11 +34,52 @@ moving_left = False
 clock = pygame.time.Clock()
 FPS = 60
 
-# gravity
-GRAVITY = 0.75
+# start animation
+run_start_animation = True
 
 # game modes
 running = True
+
+class StartAnimation:
+    def __init__(self):
+        # left rect
+        self.left_surface = Surface((settings.SCREEN_WIDTH / 2 + 10, settings.SCREEN_HEIGHT))
+        self.left_rect = self.left_surface.get_rect()
+        self.left_rect.topright = (1, 0)
+
+        # right rect
+        self.right_surface = Surface((settings.SCREEN_WIDTH / 2 + 10, settings.SCREEN_HEIGHT))
+        self.right_rect = self.right_surface.get_rect()
+        self.right_rect.topleft = (settings.SCREEN_WIDTH - 1, 0)
+
+        self.speed = 5
+        self.reached_dest = False
+
+        # set time to make animation stop when reached middle of the screen
+        self.time = pygame.time.get_ticks()
+
+    def update(self, run_animation):
+        current_time = pygame.time.get_ticks()
+
+        # if rect hasnt reached middle of the screen
+        if not self.reached_dest:
+            self.left_rect.right += self.speed
+            self.right_rect.left -= self.speed
+        # if rect reached middle for a short period of time
+        elif current_time > self.time + 4000:
+            self.left_rect.right -= self.speed
+            self.right_rect.left += self.speed
+
+        if self.left_rect.right >= settings.SCREEN_WIDTH/2:
+            self.reached_dest = True
+
+        if self.left_rect.right < 0:
+            run_animation = False
+
+    def draw(self):
+        screen.blit(self.left_surface, self.left_rect)
+        screen.blit(self.right_surface, self.right_rect)
+
 
 
 class IronMan(Sprite):
@@ -158,7 +199,7 @@ class IronMan(Sprite):
                 screen.blit(pygame.transform.flip(self.images[int(self.current_image)], self.flip, False), self.rect)
 
     def draw_flight(self):
-        if self.jump and player.energy > 0:
+        if self.alive and self.jump and player.energy > 0:
             self.flight_rect.midtop = (self.rect.centerx, self.rect.bottom + 10)
             screen.blit(self.flight_image, self.flight_rect)
 
@@ -271,7 +312,7 @@ class Ultron(Sprite):
         self.max_movement = random.randint(100, 250)
 
         # vision
-        self.vision_surf = Surface((settings.SCREEN_WIDTH // 2, 10))
+        self.vision_surf = Surface((settings.SCREEN_WIDTH // 2.3, 10))
         self.vision_surf.fill(RED)
         self.vision_rect = self.vision_surf.get_rect()
         self.shoot = False
@@ -418,6 +459,9 @@ ground = Ground()
 
 ultron_laser_group = Group()
 
+# start animation
+start_animation = StartAnimation()
+
 
 
 # game loop
@@ -442,13 +486,18 @@ while running:
     ultron_laser_group.draw(screen)
     player.draw()
 
+    # run start animation
+    if run_start_animation:
+        start_animation.update(run_start_animation)
+        start_animation.draw()
+
     # handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
         # keyboard down
-        if player.alive:
+        if player.alive and not run_start_animation:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_d:  # moving right
                     moving_right = True
