@@ -34,14 +34,14 @@ moving_left = False
 clock = pygame.time.Clock()
 FPS = 60
 
-# start animation
-run_start_animation = True
 
 # game modes
 running = True
 
 class StartAnimation:
     def __init__(self):
+        # check to see if start animation has ended
+        self.run_start_animation = True
         # left rect
         self.left_surface = Surface((settings.SCREEN_WIDTH / 2 + 10, settings.SCREEN_HEIGHT))
         self.left_rect = self.left_surface.get_rect()
@@ -58,7 +58,7 @@ class StartAnimation:
         # set time to make animation stop when reached middle of the screen
         self.time = pygame.time.get_ticks()
 
-    def update(self, run_animation):
+    def update(self):
         current_time = pygame.time.get_ticks()
 
         # if rect hasnt reached middle of the screen
@@ -73,8 +73,8 @@ class StartAnimation:
         if self.left_rect.right >= settings.SCREEN_WIDTH/2:
             self.reached_dest = True
 
-        if self.left_rect.right < 0:
-            run_animation = False
+        if self.left_rect.right <= 0:
+            self.run_start_animation = False
 
     def draw(self):
         screen.blit(self.left_surface, self.left_rect)
@@ -487,8 +487,8 @@ while running:
     player.draw()
 
     # run start animation
-    if run_start_animation:
-        start_animation.update(run_start_animation)
+    if start_animation.run_start_animation:
+        start_animation.update()
         start_animation.draw()
 
     # handle events
@@ -497,7 +497,7 @@ while running:
             running = False
 
         # keyboard down
-        if player.alive and not run_start_animation:
+        if player.alive and not start_animation.run_start_animation:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_d:  # moving right
                     moving_right = True
