@@ -54,6 +54,9 @@ class IronMan(Sprite):
         # starting position
         self.rect.x = 100
         self.rect.bottom = 300
+        # death image
+        death = pygame.image.load(f'images/iron_man/ironman_dead.png').convert_alpha()
+        self.death_image = pygame.transform.scale(death, (death.get_width() // 1.9, death.get_height() // 1.9))
         # move speed
         self.speed = 5
         self.flip = False
@@ -138,7 +141,10 @@ class IronMan(Sprite):
                 self.energy += 2
 
     def draw(self):
-        if not self.shoot:
+        if not self.alive:
+            self.image = self.death_image
+            screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
+        elif not self.shoot:
             screen.blit(pygame.transform.flip(self.images[0], self.flip, False), self.rect)
         else:
             self.current_image += 0.15
@@ -375,7 +381,7 @@ class UltronLaser(Sprite):
         # check collision with iron man reduce health if hit
         if iron_man.alive and self.rect.colliderect(iron_man.rect):
             self.kill()
-            iron_man.health -= 15
+            iron_man.health -= 10
 
 
 
