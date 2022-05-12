@@ -476,12 +476,30 @@ class UltronIcon(Sprite):
         self.rect = self.image.get_rect()
         self.rect.topright = (settings.SCREEN_WIDTH - 60, 20)
 
+        # font for number of ultrons alive
+        self.font_bold = pygame.font.match_font('arial', bold=True)
+        self.font = pygame.font.Font(self.font_bold, 20)
+        self.ultron_count = 0
+        self.ultron_number = self.font.render(f'X {self.ultron_count}', False, BLACK)
+        self.ultron_number_rect = self.ultron_number.get_rect()
+        self.ultron_number_rect.topleft = (settings.SCREEN_WIDTH - 50, 35)
+
+    def update(self, ultron_group):
+        self.ultron_count = 0
+        for ul in ultron_group:
+            if ul.alive:
+                self.ultron_count += 1
+        self.ultron_number = self.font.render(f'X {self.ultron_count}', True, BLACK)
+
     def draw(self):
         screen.blit(self.image, self.rect)
+        screen.blit(self.ultron_number, self.ultron_number_rect)
 
+
+player = IronMan()
 
 iron_man_laser = IronManLaser()
-player = IronMan()
+
 # x = tile size * tile position, y = tile size * tile position + 1
 ultron_0 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 5)
 ultron_1 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 10)
@@ -495,6 +513,7 @@ ultron_group.add(ultron_1)
 ultron_group.add(ultron_2)
 ultron_group.add(ultron_3)
 
+# sky background
 ground = Ground()
 
 ultron_laser_group = Group()
@@ -502,6 +521,7 @@ ultron_laser_group = Group()
 # start animation
 start_animation = StartAnimation()
 
+# ultron icon
 ultron_icon = UltronIcon()
 
 
@@ -525,6 +545,7 @@ while running:
         ul.draw()
     ultron_laser_group.update(player)
     ultron_laser_group.draw(screen)
+    ultron_icon.update(ultron_group)
     ultron_icon.draw()
     player.draw()
 
