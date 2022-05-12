@@ -73,7 +73,7 @@ class StartAnimation:
         self.reached_dest = False
         self.show_lightning = False
 
-        # set time to make animation stop when reached middle of the screen
+        # set time to make animation stop for a period when reached middle of the screen
         self.time = pygame.time.get_ticks()
 
     def update(self):
@@ -200,7 +200,7 @@ class IronMan(Sprite):
                     self.rect.x -= self.speed
 
             if self.jump and self.energy > 0:
-                self.energy -= 0.5
+                self.energy -= 1
                 if self.rect.top > 5:
                     self.rect.y -= 5
                     self.on_ground = False
@@ -455,8 +455,6 @@ class UltronLaser(Sprite):
             self.kill()
             iron_man.health -= 10
 
-
-
 class UltronHealth:
     def __init__(self, max_health):
         self.max_health = max_health
@@ -469,6 +467,17 @@ class UltronHealth:
         # draw actual health
         ratio = health / self.max_health
         pygame.draw.rect(screen, BLUE, (left, top - 20, width * ratio, 10))
+
+class UltronIcon(Sprite):
+    def __init__(self):
+        super().__init__()
+        image = pygame.image.load('images/ultron/ultron_icon.png').convert_alpha()
+        self.image = pygame.transform.scale(image, (image.get_width() // 1.5, image.get_height() // 1.5))
+        self.rect = self.image.get_rect()
+        self.rect.topright = (settings.SCREEN_WIDTH - 60, 20)
+
+    def draw(self):
+        screen.blit(self.image, self.rect)
 
 
 iron_man_laser = IronManLaser()
@@ -493,6 +502,7 @@ ultron_laser_group = Group()
 # start animation
 start_animation = StartAnimation()
 
+ultron_icon = UltronIcon()
 
 
 # game loop
@@ -515,7 +525,9 @@ while running:
         ul.draw()
     ultron_laser_group.update(player)
     ultron_laser_group.draw(screen)
+    ultron_icon.draw()
     player.draw()
+
 
     # run start animation
     if start_animation.run_start_animation:
