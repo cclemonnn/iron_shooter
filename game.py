@@ -55,15 +55,23 @@ class StartAnimation:
         # iron man start image
         self.iron_man_start_image = pygame.image.load('images/iron_man/ironman_start_image.png').convert_alpha()
         self.iron_man_start_rect = self.iron_man_start_image.get_rect()
-        self.iron_man_start_rect.midright = (-30, settings.SCREEN_HEIGHT / 2)
+        self.iron_man_start_rect.midright = (-200, settings.SCREEN_HEIGHT / 2)
 
         # ultron start image
         self.ultron_start_image = pygame.image.load('images/ultron/ultron_start_image.png').convert_alpha()
         self.ultron_start_rect = self.ultron_start_image.get_rect()
-        self.ultron_start_rect.midleft = (settings.SCREEN_WIDTH + 30, settings.SCREEN_HEIGHT / 2)
+        self.ultron_start_rect.midleft = (settings.SCREEN_WIDTH + 200, settings.SCREEN_HEIGHT / 2)
+
+        # lightning
+        lightning = pygame.image.load('images/start_images/start_lightning_cropped.png').convert_alpha()
+        self.lightning_image = \
+            pygame.transform.scale(lightning, (lightning.get_width() // 2, lightning.get_height() // 2))
+        self.lightning_rect = self.lightning_image.get_rect()
+        self.lightning_rect.center = (settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
 
         self.speed = 5
         self.reached_dest = False
+        self.show_lightning = False
 
         # set time to make animation stop when reached middle of the screen
         self.time = pygame.time.get_ticks()
@@ -79,6 +87,7 @@ class StartAnimation:
             self.ultron_start_rect.left -= self.speed
         # if rect reached middle for a short period of time
         elif current_time > self.time + 4000:
+            self.show_lightning = False
             self.left_rect.right -= self.speed
             self.right_rect.left += self.speed
             self.iron_man_start_rect.right -= self.speed
@@ -86,6 +95,7 @@ class StartAnimation:
 
         if self.left_rect.right >= settings.SCREEN_WIDTH/2:
             self.reached_dest = True
+            self.show_lightning = True
 
         if self.left_rect.right <= 0:
             self.run_start_animation = False
@@ -95,6 +105,9 @@ class StartAnimation:
         screen.blit(self.right_surface, self.right_rect)
         screen.blit(self.iron_man_start_image, self.iron_man_start_rect)
         screen.blit(self.ultron_start_image, self.ultron_start_rect)
+        if self.show_lightning:
+            screen.blit(self.lightning_image, self.lightning_rect)
+
 
 
 
