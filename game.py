@@ -42,15 +42,25 @@ class StartAnimation:
     def __init__(self):
         # check to see if start animation has ended
         self.run_start_animation = True
-        # left rect
+        # left background rect
         self.left_surface = Surface((settings.SCREEN_WIDTH / 2 + 10, settings.SCREEN_HEIGHT))
         self.left_rect = self.left_surface.get_rect()
         self.left_rect.topright = (1, 0)
 
-        # right rect
+        # right background rect
         self.right_surface = Surface((settings.SCREEN_WIDTH / 2 + 10, settings.SCREEN_HEIGHT))
         self.right_rect = self.right_surface.get_rect()
         self.right_rect.topleft = (settings.SCREEN_WIDTH - 1, 0)
+
+        # iron man start image
+        self.iron_man_start_image = pygame.image.load('images/iron_man/ironman_start_image.png').convert_alpha()
+        self.iron_man_start_rect = self.iron_man_start_image.get_rect()
+        self.iron_man_start_rect.midright = (-30, settings.SCREEN_HEIGHT / 2)
+
+        # ultron start image
+        self.ultron_start_image = pygame.image.load('images/ultron/ultron_start_image.png').convert_alpha()
+        self.ultron_start_rect = self.ultron_start_image.get_rect()
+        self.ultron_start_rect.midleft = (settings.SCREEN_WIDTH + 30, settings.SCREEN_HEIGHT / 2)
 
         self.speed = 5
         self.reached_dest = False
@@ -65,10 +75,14 @@ class StartAnimation:
         if not self.reached_dest:
             self.left_rect.right += self.speed
             self.right_rect.left -= self.speed
+            self.iron_man_start_rect.right += self.speed
+            self.ultron_start_rect.left -= self.speed
         # if rect reached middle for a short period of time
         elif current_time > self.time + 4000:
             self.left_rect.right -= self.speed
             self.right_rect.left += self.speed
+            self.iron_man_start_rect.right -= self.speed
+            self.ultron_start_rect.left += self.speed
 
         if self.left_rect.right >= settings.SCREEN_WIDTH/2:
             self.reached_dest = True
@@ -79,6 +93,10 @@ class StartAnimation:
     def draw(self):
         screen.blit(self.left_surface, self.left_rect)
         screen.blit(self.right_surface, self.right_rect)
+        screen.blit(self.iron_man_start_image, self.iron_man_start_rect)
+        screen.blit(self.ultron_start_image, self.ultron_start_rect)
+
+
 
 
 
