@@ -109,6 +109,34 @@ class StartAnimation:
             screen.blit(self.lightning_image, self.lightning_rect)
 
 
+class EndAnimation:
+    def __init__(self):
+        # background
+        self.background_surf = Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT + 10))
+        self.background_rect = self.background_surf.get_rect()
+        self.background_surf.fill(BLACK)
+        self.background_rect.bottomleft = (0, 0)
+
+        # ultron image
+        self.end_image = pygame.image.load('images/ultron/ultron_end_image.png').convert_alpha()
+        self.end_rect = self.end_image.get_rect()
+        self.end_rect.center = (settings.SCREEN_WIDTH / 2, -settings.SCREEN_HEIGHT / 2)
+
+        self.speed = 5
+        self.reached_dest = False
+
+    def update(self):
+        if not self.reached_dest:
+            self.background_rect.y += self.speed
+            self.end_rect.y += self.speed
+
+            if self.background_rect.bottom >= settings.SCREEN_HEIGHT:
+                self.reached_dest = True
+
+    def draw(self):
+        screen.blit(self.background_surf, self.background_rect)
+        screen.blit(self.end_image, self.end_rect)
+
 
 
 
@@ -482,7 +510,10 @@ class UltronIcon(Sprite):
         self.ultron_count = 0
         self.ultron_number = self.font.render(f'X {self.ultron_count}', False, BLACK)
         self.ultron_number_rect = self.ultron_number.get_rect()
-        self.ultron_number_rect.topleft = (settings.SCREEN_WIDTH - 50, 35)
+        self.ultron_number_rect.topleft = (settings.SCREEN_WIDTH - 50, 30)
+
+        # check if all ultron dead
+        self.diaplay_end_animation = False
 
     def update(self, ultron_group):
         self.ultron_count = 0
@@ -490,6 +521,8 @@ class UltronIcon(Sprite):
             if ul.alive:
                 self.ultron_count += 1
         self.ultron_number = self.font.render(f'X {self.ultron_count}', True, BLACK)
+        if self.ultron_count == 0:
+            self.diaplay_end_animation = True
 
     def draw(self):
         screen.blit(self.image, self.rect)
@@ -520,6 +553,9 @@ ultron_laser_group = Group()
 
 # start animation
 start_animation = StartAnimation()
+
+# end animation
+end_animation = EndAnimation()
 
 # ultron icon
 ultron_icon = UltronIcon()
@@ -554,6 +590,11 @@ while running:
     if start_animation.run_start_animation:
         start_animation.update()
         start_animation.draw()
+
+    # run end animation
+    if ultron_icon.diaplay_end_animation:
+        end_animation.update()
+        end_animation.draw()
 
     # handle events
     for event in pygame.event.get():
