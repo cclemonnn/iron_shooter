@@ -14,10 +14,9 @@ pygame.init()
 screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 pygame.display.set_caption('Iron Shooter')
 
-# levels
-level = Level(level_0, screen)
 
 # colors
+WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -69,6 +68,13 @@ class StartAnimation:
         self.lightning_rect = self.lightning_image.get_rect()
         self.lightning_rect.center = (settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
 
+        # instruction font
+        self.font_bold = pygame.font.match_font('arial', bold=True)
+        self.instruction_font = pygame.font.Font(self.font_bold, 40)
+        self.instruction = self.instruction_font.render('Destroy All the Ultrons!', True, WHITE)
+        self.instruction_rect = self.instruction.get_rect()
+        self.instruction_rect.center = (settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT - 100)
+
         self.speed = 5
         self.reached_dest = False
         self.show_lightning = False
@@ -86,7 +92,7 @@ class StartAnimation:
             self.iron_man_start_rect.right += self.speed
             self.ultron_start_rect.left -= self.speed
         # if rect reached middle for a short period of time
-        elif current_time > self.time + 4000:
+        elif current_time > self.time + 4500:
             self.show_lightning = False
             self.left_rect.right -= self.speed
             self.right_rect.left += self.speed
@@ -106,7 +112,11 @@ class StartAnimation:
         screen.blit(self.iron_man_start_image, self.iron_man_start_rect)
         screen.blit(self.ultron_start_image, self.ultron_start_rect)
         if self.show_lightning:
+            # shows lightning
             screen.blit(self.lightning_image, self.lightning_rect)
+            # shows instruction
+            screen.blit(self.instruction, self.instruction_rect)
+
 
 
 class EndAnimation:
@@ -122,6 +132,19 @@ class EndAnimation:
         self.end_rect = self.end_image.get_rect()
         self.end_rect.center = (settings.SCREEN_WIDTH / 2, -settings.SCREEN_HEIGHT / 2)
 
+        # restart font
+        self.font_bold = pygame.font.match_font('arial', bold=True)
+        self.restart_font = pygame.font.Font(self.font_bold, 25)
+        self.restart = self.restart_font.render('Press \'1\' to restart the game', True, WHITE)
+        self.restart_rect = self.restart.get_rect()
+        self.restart_rect.bottomright = (settings.SCREEN_WIDTH - 20, settings.SCREEN_HEIGHT - 40)
+
+        # ultron death message
+        self.ultron_death_font = pygame.font.Font(self.font_bold, 40)
+        self.ultron_death_message = self.ultron_death_font.render('I WILL BE BACK, Iron Man!!!', True, RED)
+        self.ultron_death_message_rect = self.ultron_death_message.get_rect()
+        self.ultron_death_message_rect.topright = (settings.SCREEN_WIDTH - 100, 40)
+
         self.speed = 5
         self.reached_dest = False
 
@@ -136,9 +159,10 @@ class EndAnimation:
     def draw(self):
         screen.blit(self.background_surf, self.background_rect)
         screen.blit(self.end_image, self.end_rect)
-
-
-
+        if self.reached_dest:
+            screen.blit(self.restart, self.restart_rect)
+            # the following message produce ultron death message. didnt like it so not gonna include it
+            # screen.blit(self.ultron_death_message, self.ultron_death_message_rect)
 
 
 class IronMan(Sprite):
@@ -528,37 +552,43 @@ class UltronIcon(Sprite):
         screen.blit(self.image, self.rect)
         screen.blit(self.ultron_number, self.ultron_number_rect)
 
-
-player = IronMan()
-
 iron_man_laser = IronManLaser()
 
-# x = tile size * tile position, y = tile size * tile position + 1
-ultron_0 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 5)
-ultron_1 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 10)
-ultron_2 = Ultron(settings.TILE_SIZE * 44 + 30, settings.TILE_SIZE * 3)
-ultron_3 = Ultron(settings.TILE_SIZE * 40 + 30, settings.TILE_SIZE * 6)
+
+def initialize_movable_components():
+    global player, ultron_group, level, start_animation, end_animation, ultron_icon
+    # levels
+    level = Level(level_0, screen)
+    # start animation
+    start_animation = StartAnimation()
+
+    # end animation
+    end_animation = EndAnimation()
+
+    # ultron icon
+    ultron_icon = UltronIcon()
+
+    player = IronMan()
+    # x = tile size * tile position, y = tile size * tile position + 1
+    ultron_0 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 5)
+    ultron_1 = Ultron(settings.TILE_SIZE * 11 + 30, settings.TILE_SIZE * 10)
+    ultron_2 = Ultron(settings.TILE_SIZE * 44 + 30, settings.TILE_SIZE * 3)
+    ultron_3 = Ultron(settings.TILE_SIZE * 40 + 30, settings.TILE_SIZE * 6)
+    ultron_group = Group()
+    ultron_group.add(ultron_0)
+    ultron_group.add(ultron_1)
+    ultron_group.add(ultron_2)
+    ultron_group.add(ultron_3)
 
 
-ultron_group = Group()
-ultron_group.add(ultron_0)
-ultron_group.add(ultron_1)
-ultron_group.add(ultron_2)
-ultron_group.add(ultron_3)
+initialize_movable_components()
 
 # sky background
 ground = Ground()
 
 ultron_laser_group = Group()
 
-# start animation
-start_animation = StartAnimation()
 
-# end animation
-end_animation = EndAnimation()
-
-# ultron icon
-ultron_icon = UltronIcon()
 
 
 # game loop
@@ -592,7 +622,7 @@ while running:
         start_animation.draw()
 
     # run end animation
-    if ultron_icon.diaplay_end_animation:
+    if ultron_icon.diaplay_end_animation or not player.alive:
         end_animation.update()
         end_animation.draw()
 
@@ -613,6 +643,7 @@ while running:
                 if event.key == pygame.K_SPACE:
                     player.shoot = True
 
+
         # keyboard up
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_d:
@@ -621,6 +652,14 @@ while running:
                     moving_left = False
                 elif event.key == pygame.K_w:
                     player.jump = False
+                # if all ultron dead
+                if end_animation.reached_dest and event.key == pygame.K_1:
+                    initialize_movable_components()
+
+        else:
+            if event.type == pygame.KEYUP:
+                if end_animation.reached_dest and event.key == pygame.K_1:
+                    initialize_movable_components()
 
     pygame.display.update()
 
