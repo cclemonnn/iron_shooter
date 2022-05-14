@@ -14,7 +14,6 @@ pygame.init()
 screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 pygame.display.set_caption('Iron Shooter')
 
-
 # colors
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
@@ -33,9 +32,9 @@ moving_left = False
 clock = pygame.time.Clock()
 FPS = 60
 
-
 # game modes
 running = True
+
 
 class StartAnimation:
     def __init__(self):
@@ -99,10 +98,11 @@ class StartAnimation:
             self.iron_man_start_rect.right -= self.speed
             self.ultron_start_rect.left += self.speed
 
-        if self.left_rect.right >= settings.SCREEN_WIDTH/2:
+        if self.left_rect.right >= settings.SCREEN_WIDTH / 2:
             self.reached_dest = True
             self.show_lightning = True
 
+        # stops animation
         if self.left_rect.right <= 0:
             self.run_start_animation = False
 
@@ -116,7 +116,6 @@ class StartAnimation:
             screen.blit(self.lightning_image, self.lightning_rect)
             # shows instruction
             screen.blit(self.instruction, self.instruction_rect)
-
 
 
 class EndAnimation:
@@ -139,11 +138,11 @@ class EndAnimation:
         self.restart_rect = self.restart.get_rect()
         self.restart_rect.bottomright = (settings.SCREEN_WIDTH - 20, settings.SCREEN_HEIGHT - 40)
 
-        # ultron death message
-        self.ultron_death_font = pygame.font.Font(self.font_bold, 40)
-        self.ultron_death_message = self.ultron_death_font.render('I WILL BE BACK, Iron Man!!!', True, RED)
-        self.ultron_death_message_rect = self.ultron_death_message.get_rect()
-        self.ultron_death_message_rect.topright = (settings.SCREEN_WIDTH - 100, 40)
+        # ultron death message (excluded)
+        # self.ultron_death_font = pygame.font.Font(self.font_bold, 40)
+        # self.ultron_death_message = self.ultron_death_font.render('I WILL BE BACK, Iron Man!!!', True, RED)
+        # self.ultron_death_message_rect = self.ultron_death_message.get_rect()
+        # self.ultron_death_message_rect.topright = (settings.SCREEN_WIDTH - 100, 40)
 
         self.speed = 5
         self.reached_dest = False
@@ -169,6 +168,7 @@ class IronMan(Sprite):
     def __init__(self):
         super().__init__()
         self.images = []
+        # static and shoot images
         for i in range(3):
             image = pygame.image.load(f'images/iron_man/{i}.png').convert_alpha()
             image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
@@ -274,7 +274,7 @@ class IronMan(Sprite):
             self.current_image += 0.15
             if 9 > self.current_image > 2:
                 screen.blit(pygame.transform.flip(self.images[2], self.flip, False), self.rect)
-                iron_man_laser.shoot()
+                iron_man_laser.shoot(self)
             elif self.current_image >= 9:
                 self.current_image = 0
                 self.shoot = False
@@ -285,7 +285,6 @@ class IronMan(Sprite):
         if self.alive and self.jump and player.energy > 0:
             self.flight_rect.midtop = (self.rect.centerx, self.rect.bottom + 10)
             screen.blit(self.flight_image, self.flight_rect)
-
 
     def draw_health_bar(self):
         # draw health box boarder
@@ -323,14 +322,14 @@ class IronManLaser(Sprite):
         self.image = pygame.transform.scale(image, (image.get_width() // 1.9, image.get_height() // 1.9))
         self.rect = self.image.get_rect()
 
-    def shoot(self):
-        if not player.flip:
-            self.rect.left = player.rect.right + 40
-            self.rect.y = player.rect.y + 5
+    def shoot(self, iron_man):
+        if not iron_man.flip:
+            self.rect.left = iron_man.rect.right + 40
+            self.rect.y = iron_man.rect.y + 5
         else:
-            self.rect.right = player.rect.left + 10
-            self.rect.y = player.rect.y + 5
-        screen.blit(pygame.transform.flip(self.image, player.flip, False), self.rect)
+            self.rect.right = iron_man.rect.left + 10
+            self.rect.y = iron_man.rect.y + 5
+        screen.blit(pygame.transform.flip(self.image, iron_man.flip, False), self.rect)
         # player.energy -= 1 (could let shooting cost energy if added this code)
         # check collisions with ultron
         ultron_shot = pygame.sprite.spritecollide(iron_man_laser, ultron_group, False)
@@ -344,6 +343,7 @@ class IronManLaser(Sprite):
 
 
 class Ground(Sprite):
+    # sky background
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load('images/sky/sky_1.png').convert_alpha()
@@ -352,10 +352,12 @@ class Ground(Sprite):
         self.rect.y = -2700
 
     def update(self, movement):
+        # this method scrolls the background (not called)
         self.rect.x += movement
 
     def draw(self):
         screen.blit(self.image, self.rect)
+
 
 class Ultron(Sprite):
     def __init__(self, x, bottom):
@@ -443,7 +445,7 @@ class Ultron(Sprite):
             self.current_shoot_image += 0.1
             if self.current_shoot_image < 2 and self.can_shoot:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
-            elif 2 <= self.current_shoot_image < 3: # and self.can_shoot:
+            elif 2 <= self.current_shoot_image < 3:  # and self.can_shoot:
                 self.image = self.shoot_image[int(self.current_shoot_image)]
                 # ultron_laser_group.add(UltronLaser(self))
                 # self.can_shoot = False
@@ -465,12 +467,11 @@ class Ultron(Sprite):
         # position the vision rect
         if not self.flip:
             self.vision_rect.midleft = self.rect.midright
-        else: # facing left
+        else:  # facing left
             self.vision_rect.midright = self.rect.midleft
         # check if player in ultron's vision
         if self.vision_rect.colliderect(iron_man.rect):
             self.shoot = True
-
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -494,7 +495,6 @@ class UltronLaser(Sprite):
             self.rect.right = ultron.rect.left
             self.rect.y = ultron.rect.centery - 50
 
-
     def update(self, iron_man):
         if self.right:
             self.rect.x += self.speed
@@ -506,6 +506,7 @@ class UltronLaser(Sprite):
         if iron_man.alive and self.rect.colliderect(iron_man.rect):
             self.kill()
             iron_man.health -= 10
+
 
 class UltronHealth:
     def __init__(self, max_health):
@@ -519,6 +520,7 @@ class UltronHealth:
         # draw actual health
         ratio = health / self.max_health
         pygame.draw.rect(screen, BLUE, (left, top - 20, width * ratio, 10))
+
 
 class UltronIcon(Sprite):
     def __init__(self):
@@ -552,7 +554,6 @@ class UltronIcon(Sprite):
         screen.blit(self.image, self.rect)
         screen.blit(self.ultron_number, self.ultron_number_rect)
 
-iron_man_laser = IronManLaser()
 
 
 def initialize_movable_components():
@@ -583,13 +584,12 @@ def initialize_movable_components():
 
 initialize_movable_components()
 
+iron_man_laser = IronManLaser()
+
 # sky background
 ground = Ground()
 
 ultron_laser_group = Group()
-
-
-
 
 # game loop
 while running:
@@ -614,7 +614,6 @@ while running:
     ultron_icon.update(ultron_group)
     ultron_icon.draw()
     player.draw()
-
 
     # run start animation
     if start_animation.run_start_animation:
@@ -643,8 +642,7 @@ while running:
                 if event.key == pygame.K_SPACE:
                     player.shoot = True
 
-
-        # keyboard up
+            # keyboard up
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_d:
                     moving_right = False
@@ -654,11 +652,14 @@ while running:
                     player.jump = False
                 # if all ultron dead
                 if end_animation.reached_dest and event.key == pygame.K_1:
+                    # if player pressed '1', restart game
                     initialize_movable_components()
 
         else:
+            # if iron man dead
             if event.type == pygame.KEYUP:
                 if end_animation.reached_dest and event.key == pygame.K_1:
+                    # if player pressed '1', restart game
                     initialize_movable_components()
 
     pygame.display.update()
