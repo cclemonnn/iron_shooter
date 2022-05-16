@@ -8,7 +8,7 @@ I am a huge Marvel fan. Therefore, I used Iron Man as the main character that pl
 Iron Man: Main character controlled by the player. Iron Man can destroy Ultrons by shooting laser. 
 Iron Man loses health if hit by Ultron's green laser or if he touches lava. Iron Man's energy bar decreases in flight and recharges when he lands on ground.
 
-Ultron: 4 ultrons in the game. Ultrons shoot laser if Iron Man appears in their vision.
+Ultron: 4 Ultrons in the game. Ultrons shoot laser if Iron Man appears in their vision.
 
 Game ends if all Ultrons are destroyed or Iron Man's health drops to zero.
 
