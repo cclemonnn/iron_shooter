@@ -21,7 +21,7 @@ Iron Man:
 - Space to shoot laser 
 
 Restart Game:
-- Once game is over and end animation finishes, press '1' to restart the game
+- Once game is over and end animation finishes, press '1' to restart the game.
 
 ----------------------------------------------
 ### Code References
