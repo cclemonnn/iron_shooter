@@ -32,7 +32,11 @@ Restart Game:
 ----------------------------------------------
 ### Image References
 - Iron Man and Ultron: Cyrus Annihilator (solid.cyrus@gmail.com)
-- Terrains, Palms, and Grass: Clear Code (YouTube Channel)
-- 
+- Terrains, Palms, and Grass: Clear Code (https://github.com/clear-code-projects/2D-Mario-style-platformer)
+- Rest of images: downloaded from https://www.pngegg.com/ without authors
+
+---------------------------------------------
+### SetUp
+Install pygame and run game.py and the game should run.
 
 
