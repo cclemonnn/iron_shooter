@@ -5,6 +5,8 @@ from pygame.sprite import Group
 from support import import_csv_layout, import_cut_graphics
 from tiles import StaticTile
 
+'''this class contains unmovable components: terrain, palms, grass, lava'''
+
 
 class Level:
     def __init__(self, level_data, surface):
@@ -31,7 +33,6 @@ class Level:
         # lava
         lava_layout = import_csv_layout(level_data['lava'])
         self.lava_sprites = self.create_tile_group(lava_layout, 'lava')
-
 
     def create_tile_group(self, layout, image_type):
         sprite_group = Group()
@@ -72,7 +73,6 @@ class Level:
                         sprite = StaticTile(TILE_SIZE, x, y, tile_surface)
                         sprite_group.add(sprite)
 
-
         return sprite_group
 
     def draw(self):
@@ -86,8 +86,6 @@ class Level:
         self.palms_sprites.draw(self.display_surface)
         # draw palms_1
         self.palms_1_sprites.draw(self.display_surface)
-
-
 
     def update(self, movement):
         # update terrain
@@ -108,7 +106,7 @@ class Level:
             iron_man.on_ground = False
         else:
             for grass in grass_collisions:
-                if grass.rect.centery +20 < iron_man.rect.bottom <= grass.rect.bottom:
+                if grass.rect.centery + 20 < iron_man.rect.bottom <= grass.rect.bottom:
                     iron_man.on_ground = True
 
         # check iron man collisions with lava
@@ -119,7 +117,3 @@ class Level:
             if iron_man.health >= 0:
                 for lava in lava_collisions:
                     iron_man.health -= 0.5
-
-
-
-
