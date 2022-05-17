@@ -1,3 +1,5 @@
+'''variables that are commonly used by many modules'''
+
 VERTICAL_TILE_NUMBER = 11
 TILE_SIZE = 64
 
