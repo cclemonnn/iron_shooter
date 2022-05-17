@@ -1,6 +1,7 @@
-import pygame
 from pygame.sprite import Sprite
 from pygame.surface import Surface
+
+'''class for tile images and updates'''
 
 
 class Tile(Sprite):
