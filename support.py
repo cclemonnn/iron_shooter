@@ -6,6 +6,8 @@ from pygame.surface import Surface
 
 from settings import TILE_SIZE
 
+'''this module is used by level.py for importing the graphics (made in Tile) from the csv file'''
+
 
 def import_csv_layout(csv_path):
     terrain_map = []
