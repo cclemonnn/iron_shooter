@@ -3,6 +3,9 @@ After making my first pygame, Peter Piu Piu Pygame, I wanted to practice more py
 This game is a side scrolling shooting game. It is similar to the traditional Mario but with shooting added. 
 I am a huge Marvel fan. Therefore, I used Iron Man as the main character that player controls and Ultrons as the antagonists. 
 ![demo1](iron_demo_images/demo1.png)
+![demo3](iron_demo_images/demo3.png)
+![demo4](iron_demo_images/demo4.png)
+![demo6](iron_demo_images/demo6.png)
 
 ----------------------------------------------
 ### Game Components
